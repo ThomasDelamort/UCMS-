@@ -7,7 +7,7 @@ public class Course {
 
     public Course(String name) {
         this.courseName = name;
-        modules = new ArrayList<>(); modules.add(new Module(""));
+        modules = new ArrayList<>();
         enrolledStudents = new ArrayList<>();
     }
 
@@ -30,8 +30,8 @@ public class Course {
         if (modules.isEmpty()) {
             System.out.println("     None");
         } else {
-            for (int i = 1; i < modules.size(); i++) {
-                System.out.println("     " + i + ". " + modules.get(i).getModuleName());
+            for (int i = 0; i < modules.size(); i++) {
+                System.out.println("     - " + modules.get(i).getModuleName());
             }
         }
 
@@ -44,4 +44,3 @@ public class Course {
             }
         }
     }
-}
