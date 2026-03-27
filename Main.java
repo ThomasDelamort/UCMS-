@@ -4,25 +4,18 @@ import java.util.ArrayList;
 public class Main {
     static ArrayList<Department> departments = new ArrayList<>();
     static ArrayList<Student> registeredStudents = new ArrayList<>();
+    static ArrayList<Course> courses = new ArrayList<>();
+    static ArrayList<Module> modules = new ArrayList<>();
     static Scanner sc = new Scanner(System.in);
     static int choice;
 
     public static void main(String[] args) {
-        departments.add(new  Department(""));
-        registeredStudents.add(new Student("", ""));
-
         do {
-            System.out.println("""
-                    ==== University Management System ====
-                    1. Register Student
-                    2. Add Department
-                    3. Assign Course to Department
-                    4. Add Module to Course
-                    5. Enroll Student to Course
-                    6. Display All Information
-                    7. Display Students
-                    8. Exit
-                    """);
+            if (courses.isEmpty()) {
+                menuAdd();
+            } else {
+                menu();
+            }
 
             System.out.print("Enter choice: ");
             choice = sc.nextInt(); sc.nextLine();
@@ -30,16 +23,18 @@ public class Main {
             switch (choice) {
                 case 1 -> registerStudent();
                 case 2 -> addDepartment();
-                case 3 -> assignCourseToDepartment();
-                case 4 -> addModuleToCourse();
-                case 5 -> enrollStudentToCourse();
-                case 6 -> displayAll();
-                case 7 -> displayStudents();
-                case 8 -> System.out.println("Exiting...");
+                case 3 -> addCourse();
+                case 4 -> assignCourseToDepartment();
+                case 5 -> addModule();
+                case 6 -> assignModuleToCourse();
+                case 7 -> enrollStudentToCourse();
+                case 8 -> displayAll();
+                case 9 -> displayStudents();
+                case 10 -> System.out.println("Exiting...");
                 default -> System.out.println("Invalid choice!");
             }
 
-        } while (choice != 8);
+        } while (choice != 10);
     }
 
     static void registerStudent() {
@@ -61,169 +56,102 @@ public class Main {
         System.out.println("Department added!\n");
     }
 
-    static void assignCourseToDepartment() {
+    static void addCourse() {
         if (departments.isEmpty()) {
-            System.out.println("No departments available\n");
-            return;
+            System.out.print("Enter Course Name: ");
+            String courseName = sc.nextLine();
+            Course course = new Course(courseName, null);
+            courses.add(course);
+            System.out.println("Course added!\n");
         } else {
             System.out.print("Enter Course Name: ");
             String courseName = sc.nextLine();
+            Course course = new Course(courseName, null);
+            courses.add(course);
+            System.out.println("Would you like to assign Course to department?");
+            System.out.println("1. Yes\n2. No\n");
+            System.out.print("Enter Choice: ");
+            choice = sc.nextInt(); sc.nextLine();
+
+            switch (choice) {
+                case 1 -> {
+                    displayDepartments();
+                    System.out.print("Select Department: ");
+                    int index = sc.nextInt(); sc.nextLine();
+                    index -= 1;
+
+                    if (index >= 0 && index < departments.size()) {
+                        departments.get(index).addCourse(course);
+                        System.out.println("Course assigned!\n");
+                    } else {
+                        System.out.println("Invalid index\n");
+                    }
+                }
+                case 2 -> {
+                    System.out.println("Course added!\n");
+                }
+                default -> System.out.println("Invalid Choice!");
+            }
+        }
+    }
+
+    static void assignCourseToDepartment() {
+        if (departments.isEmpty()) {
+            System.out.println("No Departments\n");
+        } else {
+            courseListDisplay();
+            System.out.print("Enter Course Index: ");
+            int cIndex = sc.nextInt(); sc.nextLine();
+            cIndex -= 1;
 
             displayDepartments();
-            System.out.print("Select Department Index: ");
-            int index = sc.nextInt(); sc.nextLine();
+            System.out.print("Select Department: ");
+            int dIndex = sc.nextInt(); sc.nextLine();
+            dIndex -= 1;
 
-            if (index >= 0 && index < departments.size()) {
-                departments.get(index).addCourse(new Course(courseName));
-                System.out.println("Course added!\n");
+            if (cIndex >= 0 && dIndex >= 0) {
+                departments.get(dIndex).addCourse(courses.get(cIndex));
+                System.out.println("Course assigned!\n");
             } else {
                 System.out.println("Invalid index\n");
             }
         }
     }
 
-    static void addModuleToCourse() {
-        if (departments.isEmpty()) {
-            System.out.println("No departments\n");
-            return;
-        }
 
-        displayDepartments();
-        System.out.print("Select Department: ");
-        int dIndex = sc.nextInt(); sc.nextLine();
-
-        if (dIndex < 0 || dIndex >= departments.size()) {
-            System.out.println("Invalid department\n");
-            return;
-        }
-
-        Department dept = departments.get(dIndex);
-
-        if (dept.getCourses().isEmpty()) {
-            System.out.println("No courses\n");
-            return;
-        }
-
-        displayCourses(dept);
-        System.out.print("Select Course: ");
-        int cIndex = sc.nextInt(); sc.nextLine();
-
-        if (cIndex < 0 || cIndex >= dept.getCourses().size()) {
-            System.out.println("Invalid course\n");
-            return;
-        }
-
-        System.out.print("Enter Module Name: ");
-        String moduleName = sc.nextLine();
-
-        dept.getCourses().get(cIndex).addModule(new Module(moduleName));
-        System.out.println("Module added!\n");
-    }
-
-    static void enrollStudentToCourse() {
-        if (registeredStudents.isEmpty()) {
-            System.out.println("No students\n");
-            return;
-        }
-
-        if (departments.isEmpty()) {
-            System.out.println("No departments\n");
-            return;
-        }
-
-        displayStudents();
-        System.out.print("Select Student: ");
-        int sIndex = sc.nextInt(); sc.nextLine();
-
-        if (sIndex < 0 || sIndex >= registeredStudents.size()) {
-            System.out.println("Invalid student\n");
-            return;
-        }
-
-        displayDepartments();
-        System.out.print("Select Department: ");
-        int dIndex = sc.nextInt(); sc.nextLine();
-
-        if (dIndex < 0 || dIndex >= departments.size()) {
-            System.out.println("Invalid department\n");
-            return;
-        }
-
-        Department dept = departments.get(dIndex);
-
-        if (dept.getCourses().isEmpty()) {
-            System.out.println("No courses\n");
-            return;
-        }
-
-        displayCourses(dept);
-        System.out.print("Select Course: ");
-        int cIndex = sc.nextInt(); sc.nextLine();
-
-        if (cIndex < 0 || cIndex >= dept.getCourses().size()) {
-            System.out.println("Invalid course\n");
-            return;
-        }
-
-        dept.getCourses().get(cIndex).enrollStudent(registeredStudents.get(sIndex));
-        System.out.println("Student enrolled!\n");
-    }
-
-    static void displayAll() {
-        if (departments.isEmpty()) {
-            System.out.println("No data\n");
-            return;
-        }
-        int i = 1;
-        for (Department d : departments) {
-            if (i == 1) {
-                i++;
-                continue;
+    static void addModule() {
+        if (courses.isEmpty()) {
+            System.out.println("No Courses\n");
+        } else {
+            System.out.print("Enter Module Name: ");
+            String moduleName = sc.nextLine();
+            Module newModule = new Module(moduleName);
+            modules.add(newModule);
+            if (courses.isEmpty()) {
+                System.out.println("No courses available. Module stored only.\n");
+                return;
             }
-            System.out.println("\nDepartment: " + d.getDepartmentName());
+            System.out.println("Would you like to assign Module to a Course?");
+            System.out.println("1. Yes\n2. No");
+            System.out.print("Enter Choice: ");
+            int choice = sc.nextInt(); sc.nextLine();
 
-            if (d.getCourses().isEmpty()) {
-                System.out.println(" No courses");
-            } else {
-                int j = 1;
-                for (Course c : d.getCourses()) {
-                    if (j == 1) {
-                        j++;
-                        continue;
+            switch (choice) {
+                case 1 -> {
+                    courseListDisplay();
+                    System.out.print("Select Course: ");
+                    int clIndex = sc.nextInt(); sc.nextLine();
+                    clIndex -= 1;
+
+                    if (clIndex >= 0 && clIndex < courses.size()) {
+                        courses.get(clIndex).addModule(newModule);
+                        System.out.println("Module added and assigned!\n");
+                    } else {
+                        System.out.println("Invalid course index\n");
                     }
-                    c.displayCourse();
                 }
+                case 2 -> {
+                    System.out.println("Module added (not assigned).\n");
+                }
+                default -> System.out.println("Invalid Choice!");
             }
-
-            System.out.println();
-        }
-    }
-
-    static void displayStudents() {
-        System.out.println("\n===== Students =====");
-        if (registeredStudents.isEmpty()) {
-            System.out.println("No students\n");
-            return;
-        }
-        for (int i = 1; i < registeredStudents.size(); i++) {
-            System.out.println(i + ". " + registeredStudents.get(i).getStudentName());
-        }
-        System.out.println();
-    }
-
-    static void displayDepartments() {
-        System.out.println("\n===== Departments =====");
-        for (int i = 1; i < departments.size(); i++) {
-            System.out.println(i + ". " + departments.get(i).getDepartmentName());
-        }
-        System.out.println();
-    }
-
-    static void displayCourses(Department dept) {
-        System.out.println("\n===== Courses =====");
-        for (int i = 1; i < dept.getCourses().size(); i++) {
-            System.out.println(i + ". " + dept.getCourses().get(i).getCourseName());
-        }
-        System.out.println();
-    }
-}
