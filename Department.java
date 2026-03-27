@@ -24,13 +24,4 @@ public class Department {
     public ArrayList<Course> getCourses() {
         return courses;
     }
-
-    public Course searchCourse(String courseName) {
-        for (Course course : courses) {
-            if (course.getCourseName().equals(courseName)) {
-                return course;
-            }
-        }
-        return null;
-    }
 }
