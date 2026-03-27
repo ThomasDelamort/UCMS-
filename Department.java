@@ -7,7 +7,6 @@ public class Department {
     public Department(String department) {
         this.departmentName = department;
         courses = new ArrayList<>();
-        courses.add(new Course(""));
     }
 
     public String getDepartmentName() {
@@ -24,5 +23,14 @@ public class Department {
 
     public ArrayList<Course> getCourses() {
         return courses;
+    }
+
+    public Course searchCourse(String courseName) {
+        for (Course course : courses) {
+            if (course.getCourseName().equals(courseName)) {
+                return course;
+            }
+        }
+        return null;
     }
 }
